@@ -3,9 +3,10 @@ import asyncio
 import pathlib
 import ssl
 import websockets
-#DB
-import psycopg2
-from config import config
+
+#db
+from database import db_test_connect, db_get_user_by_esp_key, db_update_message_key_for_user
+
 #REST
 from flask import Flask
 import _thread
@@ -21,38 +22,6 @@ async def hello(websocket, path):
 
     await websocket.send(greeting)
     print(f"> {greeting}")
-
-def connect_db():
-    """ Connect to the PostgreSQL database server """
-    conn = None
-    try:
-        # read connection parameters
-        params = config()
-
-        # connect to the PostgreSQL server
-        print('Connecting to the PostgreSQL database...')
-        conn = psycopg2.connect(**params)
-		
-        # create a cursor
-        cur = conn.cursor()
-        
-	    # execute a statement
-        print('PostgreSQL database version:')
-        cur.execute('SELECT version()')
-
-        # display the PostgreSQL database server version
-        db_version = cur.fetchone()
-        print(db_version)
-       
-	    # close the communication with the PostgreSQL
-        cur.close()
-    except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
-    finally:
-        if conn is not None:
-            conn.close()
-            print('Database connection closed.')
-
 
 #REST
 app = Flask(__name__)
@@ -71,7 +40,11 @@ def signal_handler(sig, frame):
 
 if __name__ == "__main__":
     #DB
-    connect_db()
+    db_test_connect()
+    user = db_get_user_by_esp_key("key_esp")
+    print(user)
+    print(db_update_message_key_for_user("TOKEN", "key"))
+
 
     #REST
     _thread.start_new_thread(flaskThread, ())
