@@ -8,7 +8,7 @@ import websockets
 from database import db_test_connect, db_get_user_by_esp_key, db_update_message_key_for_user, db_get_user_by_user_key
 
 #REST
-from flask import Flask
+from flask import Flask, Response
 import _thread
 
 import signal
@@ -55,6 +55,14 @@ def openDoor(apiKey):
     user = db_get_user_by_user_key(apiKey)
     asyncio.set_event_loop(asyncio.new_event_loop())
     return asyncio.get_event_loop().run_until_complete(_openDoor(user))
+@app.route('/setToken/<apiKey>/<token>', methods=['PUT'])
+def setToken(apiKey, token):
+    print(apiKey, token)
+    resp = Response("Foo bar baz")
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    resp.headers['Content-Type'] = 'text'
+    print("Updated token:", db_update_message_key_for_user(token, apiKey))
+    return resp
 
 async def _openDoor(user):
     if user is not None:
