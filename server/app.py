@@ -22,8 +22,11 @@ async def register(websocket, path):
     print("register", str(path))
 
 async def unregister(websocket, path):
-    del USERS[path]
-    print("unregister", str(path))
+    if USERS[path].closed:
+        del USERS[path]
+        print("unregister", str(path))
+    else:
+        print("Cannot unregister, connection is still open for", str(path))
 
 async def wss(websocket, path):
     esp = path[1:]
