@@ -1,0 +1,12 @@
+version: "3"
+services:
+  server:
+    container_name: "RemoteDoorbell_backend"
+    build: "."
+    ports:
+      - 8765:8765
+    environment:
+      PYTHONUNBUFFERED: 1
+#  database:
+#    container_name: "RemoteDoorbell_db"
+#    image: postgres:12
