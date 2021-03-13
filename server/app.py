@@ -1,10 +1,17 @@
+#WSS
 import asyncio
 import pathlib
 import ssl
 import websockets
-
+#DB
 import psycopg2
 from config import config
+#REST
+from flask import Flask
+import _thread
+
+import signal
+import sys
 
 async def hello(websocket, path):
     name = await websocket.recv()
@@ -46,8 +53,30 @@ def connect_db():
             conn.close()
             print('Database connection closed.')
 
+
+#REST
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    return "Hello World!"
+
+def flaskThread():
+    app.run(debug=False, port=5000, host='0.0.0.0')
+
+def signal_handler(sig, frame):
+    print('You pressed Ctrl+C!')
+    asyncio.get_event_loop().stop()
+    sys.exit(0)
+
 if __name__ == "__main__":
+    #DB
     connect_db()
+
+    #REST
+    _thread.start_new_thread(flaskThread, ())
+
+    #WSS
     ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
     localhost_pem = pathlib.Path(__file__).with_name("cert.pem")
     localhost_key = pathlib.Path(__file__).with_name("key.pem")
