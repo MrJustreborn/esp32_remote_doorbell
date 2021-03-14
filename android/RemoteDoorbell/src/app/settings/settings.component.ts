@@ -23,6 +23,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
     user: User = null;
 
     apiKey = "";
+    serverUrl = environment.serverUrl;
     constructor(
         private routerExtensions: RouterExtensions,
         private doorbellService: DoorbellService,
@@ -31,6 +32,9 @@ export class SettingsComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.apiKey = this.secure.getSync({
             key: KEYS.apiKey
+        })
+        this.serverUrl = this.secure.getSync({
+            key: KEYS.serverUrl
         })
 
         this.subs.push(this.doorbellService.user$.subscribe((u) => {
@@ -48,13 +52,20 @@ export class SettingsComponent implements OnInit, OnDestroy {
         this.routerExtensions.backToPreviousPage();
     }
 
-    saveData(foo: TextField) {
-        console.log(foo.text)
-        this.apiKey = foo.text;
+    saveData(apiKey: TextField, serverUrl: TextField) {
+        console.log(apiKey.text, serverUrl.text)
+        this.apiKey = apiKey.text;
+        this.serverUrl = serverUrl.text;
+
         this.secure.setSync({
             key: KEYS.apiKey,
-            value: foo.text
+            value: apiKey.text
         })
+        this.secure.setSync({
+            key: KEYS.serverUrl,
+            value: serverUrl.text
+        })
+
         this.doorbellService.getUser();
     }
 

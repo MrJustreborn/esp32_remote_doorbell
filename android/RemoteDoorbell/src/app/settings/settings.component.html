@@ -37,5 +37,11 @@ You can learn more about the NativeScript core theme at https://github.com/nativ
             returnKeyType="done"
             (returnPress)="onReturnPress($event)" #text>
     </TextField>
-    <Button class="-outline -primary" text="Save" (tap)="saveData(text)"></Button>
+    <TextField hint="Enter Server-URL"
+            [text]="serverUrl"
+            secure="false"
+            returnKeyType="done"
+            #server>
+    </TextField>
+    <Button class="-outline -primary" text="Save" (tap)="saveData(text, server)"></Button>
 </StackLayout>

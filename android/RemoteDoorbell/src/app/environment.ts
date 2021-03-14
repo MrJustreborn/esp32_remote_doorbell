@@ -5,5 +5,6 @@ export const environment = {
 
 
 export const KEYS = {
-    apiKey: "API_KEY"
+    apiKey: "API_KEY",
+    serverUrl: "SERVER_URL"
 }

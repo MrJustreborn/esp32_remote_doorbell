@@ -28,7 +28,8 @@ export class DoorbellService {
 
         try {
             const apiKey = this.getApiKey();
-            this.http.put(environment.serverUrl + 'setToken/' +apiKey+ '/' + token, {}, {
+            const serverUrl = this.getServerUrl();
+            this.http.put(serverUrl + 'setToken/' +apiKey+ '/' + token, {}, {
                 responseType: "text"
             }).toPromise()
             .then((res) => {
@@ -46,7 +47,8 @@ export class DoorbellService {
     public onOpenDoor() {
         try {
             const apiKey = this.getApiKey();
-            this.http.post(environment.serverUrl + 'open/' +apiKey, {}, {
+            const serverUrl = this.getServerUrl();
+            this.http.post(serverUrl + 'open/' +apiKey, {}, {
                 responseType: "text"
             }).toPromise()
             .then((res) => {
@@ -64,7 +66,8 @@ export class DoorbellService {
     public async getUser(): Promise<User> {
         try {
             const apiKey = this.getApiKey();
-            const user = await this.http.get<User>(environment.serverUrl + 'getUser/' +apiKey).toPromise();
+            const serverUrl = this.getServerUrl();
+            const user = await this.http.get<User>(serverUrl + 'getUser/' +apiKey).toPromise();
             console.log("Got User: ", user)
             this.user$.next(user);
             return user;
@@ -80,6 +83,14 @@ export class DoorbellService {
         if (!apiKey) {
             console.error("NO KEY DEFINED");
             throw new Error("No Key Defined");
+        }
+        return apiKey;
+    }
+    private getServerUrl() {
+        const apiKey = this.secure.getSync({key: KEYS.serverUrl});
+        if (!apiKey) {
+            console.error("NO SERVER URL DEFINED");
+            return environment.serverUrl;
         }
         return apiKey;
     }
