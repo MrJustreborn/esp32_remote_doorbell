@@ -1,16 +1,22 @@
-import { Component, OnInit } from "@angular/core";
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { Button, EventData, Slider, Switch } from "@nativescript/core";
 import { firebase } from "@nativescript/firebase";
 
 import { SecureStorage } from "@nativescript/secure-storage";
+import { Subscription } from "rxjs";
+
+import { environment, KEYS } from "../environment";
+import { DoorbellService, User } from "../services/doorbell.service";
 
 
 @Component({
     selector: "ns-items",
     templateUrl: "./door_ctrl.component.html"
 })
-export class DoorCtrlComponent implements OnInit {
+export class DoorCtrlComponent implements OnInit, OnDestroy {
+
+    private subs: Array<Subscription> = [];
 
     private secure = new SecureStorage();
 
@@ -19,17 +25,21 @@ export class DoorCtrlComponent implements OnInit {
 
     visitorModeTimme = 10;
 
+    user: User = null;
+
     constructor(
-        private router: Router
+        private router: Router,
+        private doorbellService: DoorbellService,
+        private change: ChangeDetectorRef
     ) { }
 
     ngOnInit(): void {
         this.setProgressbarWidth(100);
-        const foo = this.secure.getSync({
-            key: "apiKey"
-        });
-
-        console.log("init: ", foo)
+        this.subs.push(this.doorbellService.user$.subscribe((u) => {
+            this.user = u
+            this.change.detectChanges()
+        }))
+        this.doorbellService.getUser();
     }
 
     setProgressbarWidth(percent) {
@@ -63,10 +73,18 @@ export class DoorCtrlComponent implements OnInit {
     onOpenDoor(args: EventData) {
         let button = args.object as Button;
         console.log("Open door!")
+        this.doorbellService.onOpenDoor();
     }
 
     gotToSettings() {
         console.log("GotToSettings")
         this.router.navigate(['/settings'])
+    }
+
+    ngOnDestroy() {
+        this.subs.forEach((sub) => {
+            sub.unsubscribe();
+        });
+        this.subs = [];
     }
 }

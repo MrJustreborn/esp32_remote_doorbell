@@ -12,6 +12,8 @@ class User:
         print("Init new User")
     def __str__(self):
         return "User: " + str(self.id) + " - " + str(self.name)
+    def getJson(self):
+        return {"id":self.id,"name":self.name}
 
 
 def db_test_connect():

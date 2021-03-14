@@ -10,7 +10,12 @@ So you can still use template expressions, bindings, templates as well as all th
 The ActionBar is the NativeScript common abstraction over the Android ActionBar and iOS NavigationBar.
 http://docs.nativescript.org/ui/action-bar
 -->
-<ActionBar title="Remote Doorbell ({{'User'}})">
+<ActionBar *ngIf="user" title="Remote Doorbell ({{user?.name}} #{{user?.id}})">
+    <NavigationButton icon="font://&#xf060;" class="fas" (tap)="goBack()"></NavigationButton>
+    <!--<ActionItem icon="font://&#xf013;" class="fas" (tap)="gotToSettings()"></ActionItem>-->
+</ActionBar>
+
+<ActionBar *ngIf="!user" title="Remote Doorbell (OFFLINE)">
     <NavigationButton icon="font://&#xf060;" class="fas" (tap)="goBack()"></NavigationButton>
     <!--<ActionItem icon="font://&#xf013;" class="fas" (tap)="gotToSettings()"></ActionItem>-->
 </ActionBar>

@@ -8,7 +8,7 @@ import websockets
 from database import db_test_connect, db_get_user_by_esp_key, db_update_message_key_for_user, db_get_user_by_user_key
 
 #REST
-from flask import Flask, Response
+from flask import Flask, Response, jsonify
 import _thread
 
 import signal
@@ -63,6 +63,12 @@ def setToken(apiKey, token):
     resp.headers['Content-Type'] = 'text'
     print("Updated token:", db_update_message_key_for_user(token, apiKey))
     return resp
+@app.route('/getUser/<apiKey>', methods=['GET'])
+def getUser(apiKey):
+    user = db_get_user_by_user_key(apiKey)
+    if user is not None:
+        return jsonify(user.getJson())
+    return None
 
 async def _openDoor(user):
     if user is not None:
