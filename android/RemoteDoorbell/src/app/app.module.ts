@@ -5,6 +5,7 @@ import { HttpClientModule } from "@angular/common/http";
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
 import { DoorCtrlComponent } from "./door_ctrl/door_ctrl.component";
+import { SettingsComponent } from "./settings/settings.component";
 
 import { DoorbellService } from "./services/doorbell.service";
 
@@ -19,7 +20,8 @@ import { DoorbellService } from "./services/doorbell.service";
     ],
     declarations: [
         AppComponent,
-        DoorCtrlComponent
+        DoorCtrlComponent,
+        SettingsComponent
     ],
     providers: [DoorbellService],
     schemas: [

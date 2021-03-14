@@ -1,6 +1,9 @@
 import { Component, OnInit } from "@angular/core";
+import { Router } from "@angular/router";
 import { Button, EventData, Slider, Switch } from "@nativescript/core";
 import { firebase } from "@nativescript/firebase";
+
+import { SecureStorage } from "@nativescript/secure-storage";
 
 
 @Component({
@@ -9,15 +12,24 @@ import { firebase } from "@nativescript/firebase";
 })
 export class DoorCtrlComponent implements OnInit {
 
+    private secure = new SecureStorage();
+
     columns;
     visitorModeActive = false;
 
     visitorModeTimme = 10;
 
-    constructor() { }
+    constructor(
+        private router: Router
+    ) { }
 
     ngOnInit(): void {
         this.setProgressbarWidth(100);
+        const foo = this.secure.getSync({
+            key: "apiKey"
+        });
+
+        console.log("init: ", foo)
     }
 
     setProgressbarWidth(percent) {
@@ -55,5 +67,6 @@ export class DoorCtrlComponent implements OnInit {
 
     gotToSettings() {
         console.log("GotToSettings")
+        this.router.navigate(['/settings'])
     }
 }
