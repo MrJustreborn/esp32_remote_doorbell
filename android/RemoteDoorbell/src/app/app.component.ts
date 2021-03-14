@@ -13,8 +13,6 @@ export class AppComponent implements OnInit {
     ) {}
     ngOnInit(): void {
         firebase.init({
-            showNotificationsWhenInForeground: true,
-            persist: false,
             onMessageReceivedCallback: (message: any) => {
                 console.log(`Title: ${message.title}`);
                 console.log(`Body: ${message.body}`);

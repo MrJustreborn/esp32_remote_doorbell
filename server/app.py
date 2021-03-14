@@ -14,6 +14,13 @@ import _thread
 import signal
 import sys
 
+#firebase
+import firebase_admin
+from firebase_admin import credentials, messaging
+
+cred = credentials.Certificate("remotedoorbell-cred.json")
+frirebase_app = firebase_admin.initialize_app(cred)
+
 USERS = {}
 
 #WSS
@@ -39,6 +46,7 @@ async def wss(websocket, path):
     try:
         await websocket.send("Hello")
         async for m in websocket:
+            await _sendNotification(esp, m)
             print(esp, m)
     finally:
         await unregister(websocket, esp)
@@ -70,6 +78,7 @@ def getUser(apiKey):
         return jsonify(user.getJson())
     return None
 
+#Helper
 async def _openDoor(user):
     if user is not None:
         if user.esp_key in USERS:
@@ -80,6 +89,29 @@ async def _openDoor(user):
             return "No ESP registered"
     else:
         return "foo"
+
+async def _sendNotification(esp, what):
+    u = db_get_user_by_esp_key(esp)
+    
+    if u is None:
+        return
+    
+    message = messaging.Message(
+        notification=messaging.Notification(
+            title="Suprise Motherfucker",
+            body=what
+        ),
+        android=messaging.AndroidConfig(
+            priority='high',
+            notification=messaging.AndroidNotification(
+                icon='icon',
+                color='#f45342'
+            )
+        ),
+        token=u.message_token
+    )
+    response = messaging.send(message)
+    print('Successfully sent message:', response)
 
 def flaskThread():
     app.run(debug=False, port=5000, host='0.0.0.0')
