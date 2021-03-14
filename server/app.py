@@ -18,10 +18,15 @@ import sys
 import firebase_admin
 from firebase_admin import credentials, messaging
 
+#visitors
+import time
+
 cred = credentials.Certificate("remotedoorbell-cred.json")
 frirebase_app = firebase_admin.initialize_app(cred)
 
 USERS = {}
+
+VISITORS_MODE = {}
 
 #WSS
 async def register(websocket, path):
@@ -77,6 +82,28 @@ def getUser(apiKey):
     if user is not None:
         return jsonify(user.getJson())
     return None
+@app.route('/visitors/<apiKey>/<duration>', methods=['POST'])
+def activateVisitosMode(apiKey, duration):
+    user = db_get_user_by_user_key(apiKey)
+    if user is None:
+        return "0"
+    VISITORS_MODE[apiKey] = {
+        "start":time.time(),
+        "duration":float(duration)*60
+        }
+    return {"timeleft":float(duration)*60, "duration":float(duration)*60}
+@app.route('/visitors/<apiKey>', methods=['GET'])
+def getVisitorsModeTimeLeft(apiKey):
+    user = db_get_user_by_user_key(apiKey)
+    if user is None:
+        return {"timeleft":0, "duration":0}
+    if apiKey in VISITORS_MODE:
+        print(VISITORS_MODE[apiKey])
+        timeLeft = VISITORS_MODE[apiKey]['start'] + VISITORS_MODE[apiKey]['duration'] - time.time()
+        if timeLeft <= 0:
+            del VISITORS_MODE[apiKey]
+        return {"timeleft":int(timeLeft), "duration":int(VISITORS_MODE[apiKey]['duration'])}
+    return {"timeleft":0, "duration":0}
 
 #Helper
 async def _openDoor(user):
@@ -91,6 +118,7 @@ async def _openDoor(user):
         return "foo"
 
 async def _sendNotification(esp, what):
+    await _visitorMode(esp, what)
     u = db_get_user_by_esp_key(esp)
     
     if u is None:
@@ -112,6 +140,21 @@ async def _sendNotification(esp, what):
     )
     response = messaging.send(message)
     print('Successfully sent message:', response)
+
+async def _visitorMode(esp, what): #TODO: only open door if downstairs ring
+    u = db_get_user_by_esp_key(esp)
+    
+    if u is None:
+        print("No user found for visitorMode")
+        return
+    
+    if u.user_key in VISITORS_MODE:
+        timeLeft = VISITORS_MODE[u.user_key]['start'] + VISITORS_MODE[u.user_key]['duration'] - time.time()
+        print("VisitorMode active: ", timeLeft)
+        if timeLeft <= 0:
+            del VISITORS_MODE[u.user_key]
+        else:
+            await _openDoor(u)
 
 def flaskThread():
     app.run(debug=False, port=5000, host='0.0.0.0')
