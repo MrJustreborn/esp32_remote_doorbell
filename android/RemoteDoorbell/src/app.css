@@ -6,7 +6,7 @@ selectors and properties you can use to style UI components.
 
 /*
 In many cases you may want to use the NativeScript core theme instead
-of writing your own CSS rules. You can learn more about the 
+of writing your own CSS rules. You can learn more about the
 NativeScript core theme at https://github.com/nativescript/theme
 The imported CSS rules must precede all other types of rules.
 */
@@ -22,4 +22,31 @@ The following CSS rule changes the font size of all Buttons that have the
 */
 Button.-primary {
     font-size: 18;
+}
+
+.far {
+    font-family: Font Awesome 5 Free, fa-regular-400;
+    font-weight: 400;
+}
+
+.fab {
+    font-family: Font Awesome 5 Brands, fa-brands-400;
+    font-weight: 400;
+}
+
+.fas {
+    font-family: Font Awesome 5 Free, fa-solid-900;
+    font-weight: 900;
+}
+
+
+.progressbar {
+    height: 39;
+    margin: 10;
+    /*border-radius: 10;*/
+    border-color: black;
+    border-width: 1;
+}
+.progressbar-value {
+    background: #337ab7;
 }

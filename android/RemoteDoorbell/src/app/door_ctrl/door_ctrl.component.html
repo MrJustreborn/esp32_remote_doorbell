@@ -10,7 +10,9 @@ So you can still use template expressions, bindings, templates as well as all th
 The ActionBar is the NativeScript common abstraction over the Android ActionBar and iOS NavigationBar.
 http://docs.nativescript.org/ui/action-bar
 -->
-<ActionBar title="Remote Doorbell">
+<ActionBar title="Remote Doorbell ({{'User'}})">
+    <!--<NavigationButton icon="font://&#xf060;" class="fas" (tap)="gotToSettings()"></NavigationButton>-->
+    <ActionItem icon="font://&#xf013;" class="fas" (tap)="gotToSettings()"></ActionItem>
 </ActionBar>
 
 <!--
@@ -23,6 +25,17 @@ These components make use of the NativeScript core theme, which styles them with
 The theme also provides a set of helper class names such as p-20, h1, h2, and text-center to enhance styling.
 You can learn more about the NativeScript core theme at https://github.com/nativescript/theme
 -->
-<GridLayout>
-    <Button text="Open door!" (tap)="onOpenDoor($event)"></Button>
-</GridLayout>
+<StackLayout>
+    <Slider value="10" minValue="0" maxValue="120"
+            (valueChange)="onSliderValueChange($event)" *ngIf="!visitorModeActive">
+    </Slider>
+    <Button style="background-color: coral;" text="Activate Visitors-Mode ({{visitorModeTimme}}min)" (tap)="activateVisitorsMode($event)" *ngIf="!visitorModeActive"></Button>
+
+    <GridLayout [columns]="columns" class="progressbar" *ngIf="visitorModeActive">
+        <StackLayout col="0" class="progressbar-value"></StackLayout>
+    </GridLayout>
+    <Button style="background-color: coral;" text="Deactivate Visitors-Mode ({{visitorModeTimme}}min)" (tap)="deactivateVisitorsMode($event)" *ngIf="visitorModeActive"></Button>
+
+    <Button style="height: 500px;" class="-outline -primary" text="Open door!" (tap)="onOpenDoor($event)"></Button>
+    <!--<Button style="margin-top: 100px;" text="Settings" (tap)="gotToSettings($event)"></Button>-->
+</StackLayout>
